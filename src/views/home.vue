@@ -99,9 +99,9 @@ export default defineComponent({
 
     onMounted(()=>{
       console.log("onMounted")
-      axios.get( "/ebook/list?name=Spring").then((response)=>{
+      axios.get( "/ebook/list?name=%E6%95%99%E7%A8%8B&page=1&size=5").then((response)=>{
         const data = response.data
-        ebooks.value = data.data
+        ebooks.value = data.data.list
         ebooks1.books = data.data
         console.log(response)
       });
