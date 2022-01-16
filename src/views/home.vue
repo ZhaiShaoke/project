@@ -75,7 +75,7 @@
 import { defineComponent ,onMounted,ref,reactive,toRef} from 'vue';
 import axios from 'axios';
 
-const listData:any = [];
+/*const listData:any = [];
 
 for (let i = 0; i < 23; i++) {
   listData.push({
@@ -87,7 +87,7 @@ for (let i = 0; i < 23; i++) {
     content:
         'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
   });
-}
+}*/
 
 
 export default defineComponent({
@@ -99,18 +99,23 @@ export default defineComponent({
 
     onMounted(()=>{
       console.log("onMounted")
-      axios.get( "/ebook/list?name=%E6%95%99%E7%A8%8B&page=1&size=5").then((response)=>{
+      axios.get( "/ebook/list?name=%E6%95%99%E7%A8%8B",{
+        params:{
+          page:1,
+          size:10
+        }
+      }).then((response)=>{
         const data = response.data
         ebooks.value = data.data.list
-        ebooks1.books = data.data
+        /*ebooks1.books = data.data*/
         console.log(response)
       });
     });
 
     return{
       ebooks,
-      ebooks2:toRef(ebooks1,"books"),
-      listData,
+      /*ebooks2:toRef(ebooks1,"books"),
+      listData,*/
       pagination:{
         onChange: (page: number) => {
           console.log(page);
