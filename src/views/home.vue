@@ -102,7 +102,7 @@ export default defineComponent({
       axios.get( "/ebook/list?name=%E6%95%99%E7%A8%8B",{
         params:{
           page:1,
-          size:10
+          size:1000
         }
       }).then((response)=>{
         const data = response.data

@@ -71,6 +71,7 @@
 <script lang="ts">
 import { defineComponent ,onMounted,ref} from 'vue';
 import axios from 'axios';
+import {message} from 'ant-design-vue'
 
 const listData:any = [];
 
@@ -80,7 +81,7 @@ export default defineComponent({
    const ebooks = ref()
     const pagination = ref({
       current:1,
-      pageSize:4,
+      pageSize:10,
       total:0
     })
 
@@ -125,9 +126,7 @@ export default defineComponent({
       }
     ]
 
-    /*
-    * 数据查询
-    * */
+    /*数据查询 */
     const handleQuery = (params:any) =>{
       loading.value = true
       axios.get("/ebook/list?%E6%95%99%E7%A8%8B",{
@@ -139,11 +138,15 @@ export default defineComponent({
       }).then((response) =>{
         loading.value = false
         const data = response.data
-        ebooks.value = data.data.list
-
-        /*重置分页按钮*/
-        pagination.value.current = params.page
-        pagination.value.total = data.data.total
+        /*如果成功的话就出现提示*/
+        if(data.code === 200){
+          ebooks.value = data.data.list
+          /*重置分页按钮*/
+          pagination.value.current = params.page
+          pagination.value.total = data.data.total
+        }else{
+          message.error(data.message)
+        }
       })
     }
 
@@ -162,20 +165,20 @@ export default defineComponent({
     const modalLoading = ref(false)
     const handleModalOk = ()=>{
       modalLoading.value = true
-
       axios.post("/ebook/save",ebook.value).then((response) =>{
+        modalLoading.value = false
         const data = response.data /* data = commonResp */
         if(data.code === 200){
           modalVisible.value = false
-          modalLoading.value = false
-        }
-
+          /*modalLoading.value = false*/
         /*重新加载*/
         handleQuery({
           page:pagination.value.current,
           size:pagination.value.pageSize,
-
         })
+        }else{
+          message.error(data.message)
+        }
       })
     }
 
