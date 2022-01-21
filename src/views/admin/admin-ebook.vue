@@ -144,7 +144,7 @@ export default defineComponent({
     /*数据查询 */
     const handleQuery = (params:any) =>{
       loading.value = true
-      //如果不清理现有我数据，编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
+      /*如果不清理现有我数据，编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据*/
       ebooks.value = []
       axios.get("/ebook/list?%E6%95%99%E7%A8%8B",{
         params:{
@@ -235,7 +235,7 @@ export default defineComponent({
       })
     };
 
-    const level1 = ref() //一级分类树，children属性是二级分类
+    const level1 = ref() /*一级分类树，children属性是二级分类*/
     let categorys: any;
 
 
@@ -269,7 +269,7 @@ export default defineComponent({
       let result = ""
       categorys.forEach((item :any) =>{
         if(item.id === cid){
-          //return item.name  //注意，这里直接return不起作用
+          /*return item.name  注意，这里直接return不起作用*/
           result = item.name
         }
       })

@@ -8,10 +8,8 @@
 
       >
         <a-menu-item key="welcome">
-          <router-link to="/">
             <MailOutlined />
             <span>欢迎</span>
-          </router-link>
         </a-menu-item>
         <a-sub-menu v-for="item in level1" :key="item.id" :disabled="true">
           <template v-slot:title>
@@ -27,7 +25,12 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-list item-layout="vertical" size="large" :grid="{gutter:20, colum:3}"
+
+      <div class = "welcome" v-show = "isShowWelcome">
+        <h1>Welcome to the knowledge base</h1>
+      </div>
+
+      <a-list v-show="!isShowWelcome" item-layout="vertical" size="large" :grid="{gutter:20, colum:3}"
                :data-source="ebooks">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
@@ -90,18 +93,14 @@ export default defineComponent({
       });
     };
 
-    const handleClick = () =>{
-      console.log("menu click")
-    }
-
-
-    onMounted(()=>{
-      handleQueryCategory()
-      console.log("onMounted")
+    const isShowWelcome = ref(true)
+    let categoryId2 = 0
+    const handleQueryEbook = () =>{
       axios.get( "/ebook/list?name=%E6%95%99%E7%A8%8B",{
         params:{
           page:1,
-          size:1000
+          size:1000,
+          categoryId2: categoryId2
         }
       }).then((response)=>{
         const data = response.data
@@ -109,6 +108,27 @@ export default defineComponent({
         /*ebooks1.books = data.data*/
         console.log(response)
       });
+    }
+    const handleClick = (value:any) =>{
+      /*console.log("menu click",value)*/
+
+      if(value.key === 'welcome'){
+        isShowWelcome.value = true
+      }else{
+        categoryId2 = value.key
+        isShowWelcome.value = false
+        handleQueryEbook()
+      }
+
+      /*isShowWelcome.value = value.key === 'welcome';*/
+    }
+
+
+    onMounted(()=>{
+      handleQueryCategory()
+      /*handleQueryEbook()*/
+
+      /*console.log("onMounted")*/
     });
 
     return{
@@ -128,7 +148,8 @@ export default defineComponent({
       ],
 
       handleClick,
-      level1
+      level1,
+      isShowWelcome,
     }
 
 
