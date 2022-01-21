@@ -67,11 +67,12 @@
         <a-form-item label="名称">
           <a-input v-model:value="ebook.name" />
         </a-form-item>
-        <a-form-item label="分类一">
-         <a-input v-model:value="ebook.category1Id"/>
-        </a-form-item>
-        <a-form-item label="分类二">
-          <a-input v-model:value="ebook.category2Id"/>
+        <a-form-item label="分类">
+          <a-cascader
+            v-model:value="cateoryIds"
+            :filed-names="{label:'name',value:'id',children:'children'}"
+            :options="level1"
+            />
         </a-form-item>
         <a-form-item label="描述">
           <a-input v-model:value="ebook.description" type="textarea" />
@@ -88,7 +89,6 @@ import axios from 'axios';
 import {message} from 'ant-design-vue'
 import {Tool} from "../../../util/tool";
 
-const listData:any = [];
 
 export default defineComponent({
   name: 'AdminEbook',
@@ -115,14 +115,8 @@ export default defineComponent({
         dataIndex: 'name'
       },
       {
-        title: '分类一',
-        key:'category1Id',
-        dataIndex:'category1Id'
-      },
-      {
-        title: '分类二',
-        key:'category2Id',
-        slots: { customRender: 'name' }
+        title: '分类',
+        slots:{customRender: 'category'}
       },
       {
         title: '文档数',
@@ -177,11 +171,18 @@ export default defineComponent({
     }
 
     /*表单*/
-    const ebook = ref({})
+
+    /*
+    * 数组[100,101]对应：前端开发 / vue
+    * */
+    const categoryIds = ref()
+    const ebook = ref()
     const modalVisible = ref(false);
     const modalLoading = ref(false)
     const handleModalOk = ()=>{
       modalLoading.value = true
+      ebook.value.category1Id = categoryIds.value[0]
+      ebook.value.category2Id = categoryIds.value[1]
       axios.post("/ebook/save",ebook.value).then((response) =>{
         modalLoading.value = false
         const data = response.data /* data = commonResp */
@@ -203,6 +204,29 @@ export default defineComponent({
     const edit = (record:any) =>{
       modalVisible.value = true
       ebook.value = Tool.copy(record)
+      categoryIds.value = [ebook.value.category1Id,ebook.value.category2Id]
+    }
+
+    const level1 = ref() //一级分类树，children属性是二级分类
+    let categorys:any
+    /*数据查询 */
+    const handleQueryCategory = () =>{
+      loading.value = true
+      axios.get("/category/all?%E6%95%99%E7%A8%8B").then((response) =>{
+        loading.value = false
+        const data = response.data
+        /*如果成功的话就出现提示*/
+        if(data.code === 200){
+          const categorys = data.data
+          console.log("原始数据：",categorys)
+
+          level1.value = []
+          level1.value = Tool.array2Tree(categorys,0)
+          console.log("树形结构：",level1.value)
+        }else{
+          message.error(data.message)
+        }
+      })
     }
 
     /*新增*/
@@ -226,6 +250,7 @@ export default defineComponent({
     };
 
     onMounted(()=>{
+        handleQueryCategory()
         handleQuery({
           page:1,
           size:pagination.value.pageSize,
@@ -249,6 +274,9 @@ export default defineComponent({
       modalVisible,
       modalLoading,
       handleModalOk,
+      categoryIds,
+      level1,
+
       handleDelete
     }
 
