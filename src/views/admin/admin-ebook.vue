@@ -33,6 +33,9 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar" />
         </template>
+        <template v-slot:category="{ text, record }">
+          <span>{{getCategoryName(record.category1Id)}} / {{getCategoryName(record.category2Id)}}</span>
+        </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
             <a-button type="primary" @click="edit(record)">
@@ -69,7 +72,7 @@
         </a-form-item>
         <a-form-item label="分类">
           <a-cascader
-            v-model:value="cateoryIds"
+            v-model:value="categoryIds"
             :filed-names="{label:'name',value:'id',children:'children'}"
             :options="level1"
             />
@@ -89,6 +92,7 @@ import axios from 'axios';
 import {message} from 'ant-design-vue'
 import {Tool} from "../../../util/tool";
 
+const listData:any = [];
 
 export default defineComponent({
   name: 'AdminEbook',
@@ -116,7 +120,7 @@ export default defineComponent({
       },
       {
         title: '分类',
-        slots:{customRender: 'category'}
+        slots: {customRender:'category'}
       },
       {
         title: '文档数',
@@ -207,27 +211,7 @@ export default defineComponent({
       categoryIds.value = [ebook.value.category1Id,ebook.value.category2Id]
     }
 
-    const level1 = ref() //一级分类树，children属性是二级分类
-    let categorys:any
-    /*数据查询 */
-    const handleQueryCategory = () =>{
-      loading.value = true
-      axios.get("/category/all?%E6%95%99%E7%A8%8B").then((response) =>{
-        loading.value = false
-        const data = response.data
-        /*如果成功的话就出现提示*/
-        if(data.code === 200){
-          const categorys = data.data
-          console.log("原始数据：",categorys)
 
-          level1.value = []
-          level1.value = Tool.array2Tree(categorys,0)
-          console.log("树形结构：",level1.value)
-        }else{
-          message.error(data.message)
-        }
-      })
-    }
 
     /*新增*/
     const add = () =>{
@@ -249,6 +233,42 @@ export default defineComponent({
       })
     };
 
+    const level1 = ref() //一级分类树，children属性是二级分类
+    let categorys: any;
+
+
+    /*数据查询 */
+    const handleQueryCategory = () =>{
+      loading.value = true
+      axios.get("/category/all?%E6%95%99%E7%A8%8B").then((response) =>{
+        loading.value = false
+        const data = response.data
+        /*如果成功的话就出现提示*/
+        if(data.code === 200){
+          categorys = data.data
+          console.log("原始数据：",categorys)
+
+          level1.value = []
+          level1.value = Tool.array2Tree(categorys,0)
+          console.log("树形结构：",level1.value)
+        }else{
+          message.error(data.message)
+        }
+      })
+    }
+
+    const getCategoryName = (cid : number) =>{
+      /* console.log(cid)*/
+      let result = ""
+      categorys.forEach((item :any) =>{
+        if(item.id === cid){
+          //return item.name  //注意，这里直接return不起作用
+          result = item.name
+        }
+      })
+      return result
+    }
+
     onMounted(()=>{
         handleQueryCategory()
         handleQuery({
@@ -267,6 +287,8 @@ export default defineComponent({
       loading,
       handleTableChange,
       handleQuery,
+      getCategoryName,
+
       edit,
       add,
 
