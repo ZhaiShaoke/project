@@ -93,11 +93,12 @@
 
 
 <script lang="ts">
-import { defineComponent ,onMounted,ref} from 'vue';
+import {createVNode, defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
-import {message} from 'ant-design-vue'
+import {message, Modal} from 'ant-design-vue'
 import {Tool} from "../../../util/tool";
 import {useRoute} from "vue-router";
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 
 
 
@@ -248,7 +249,8 @@ export default defineComponent({
 
 
     }
-    const ids: Array<string> = []
+    const deleteIds: Array<string> = []
+    const deleteNames: Array<string> = []
     /*将某节点及其子孙节点全部设置为disabled*/
     const getDeleteIds = (treeSelectData : any, id:any) =>{
        /* console.log("-------" + treeSelectData,id) */
@@ -260,7 +262,8 @@ export default defineComponent({
           console.log("delete" , node)
           /* 将目标id放入结果集ids */
           /* node.disabled = true */
-          ids.push(id)
+          deleteIds.push(id)
+          deleteNames.push(node.name)
 
           /* 遍历所有子节点 */
           const children = node.children
@@ -282,14 +285,26 @@ export default defineComponent({
     const handleDelete = (id:number)=>{
       /* console.log("level.value,id") */
       getDeleteIds(level1.value,id)
+      /* 清空数组，否则多次删除时，数组会一直增加 */
+      deleteNames.length = 0
+      deleteIds.length = 0
       /* console.log(ids) */
-      axios.delete("/doc/delete/" + ids.join(",")).then((response) =>{
-        const data = response.data /* data = commonResp */
-        if(data.code === 200) {
-          /*重新加载*/
-          handleQuery()
-        }
-      })
+      Modal.confirm({
+        title: 'Important reminder',
+        icon: createVNode(ExclamationCircleOutlined),
+        content: '将删除：【' + deleteNames.join(',') + '】删除后不可恢复，确定删除？',
+        onOk() {
+          axios.delete("/doc/delete/" + deleteIds.join(",")).then((response) =>{
+            const data = response.data /* data = commonResp */
+            if(data.code === 200) {
+              /*重新加载*/
+              handleQuery()
+            } else {
+              message.error(data.message)
+            }
+          })
+        },
+      });
     };
 
     onMounted(()=>{
