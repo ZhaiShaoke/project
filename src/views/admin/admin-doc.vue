@@ -97,18 +97,27 @@ import { defineComponent ,onMounted,ref} from 'vue';
 import axios from 'axios';
 import {message} from 'ant-design-vue'
 import {Tool} from "../../../util/tool";
+import {useRoute} from "vue-router";
 
-const listData:any = [];
+
 
 export default defineComponent({
   name: 'AdminDoc',
   setup(){
+    const route = useRoute()
+    console.log("路由",route)
+    console.log("route.path",route.path)
+    console.log("route.query",route.query)
+    console.log("route.params",route.params)
+    console.log("route.fullPath",route.fullPath)
+    console.log("route.name",route.name)
+    console.log("route.meta",route.meta)
     const param = ref()
     param.value = {}
     const docs = ref()
 
 
-  const loading = ref(false)
+    const loading = ref(false)
 
     const columns = [
       {
@@ -142,7 +151,7 @@ export default defineComponent({
      *   }]
      * }]
      */
-    const level1 = ref() //一级分类树，children属性是二级分类
+    const level1 = ref() /*一级分类树，children属性是二级分类*/
 
     /*数据查询 */
     const handleQuery = () =>{
@@ -231,7 +240,9 @@ export default defineComponent({
     /*新增*/
     const add = () =>{
       modalVisible.value = true
-      doc.value = {}
+      doc.value = {
+        ebookId:route.query.ebookId
+      }
       treeSelectData.value = Tool.copy(level1.value)
       treeSelectData.value.unshift({id:'0',value:'none'})
 
@@ -256,7 +267,7 @@ export default defineComponent({
 
     return{
       param,
-      //docs,
+      /*docs,*/
       level1,
       columns,
       loading,

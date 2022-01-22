@@ -129,7 +129,7 @@ export default defineComponent({
      *   }]
      * }]
      */
-    const level1 = ref() //一级分类树，children属性是二级分类
+    const level1 = ref() /*一级分类树，children属性是二级分类 */
 
     /*数据查询 */
     const handleQuery = () =>{
@@ -201,7 +201,7 @@ export default defineComponent({
 
     return{
       param,
-      //categorys,
+      /* categorys, */
       level1,
       columns,
       loading,
