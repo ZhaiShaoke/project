@@ -21,7 +21,7 @@
             </a-form>
           </p>
           <a-table
-              v-if="level1.length > 0"
+
               :columns="columns"
               :row-key="record => record.id"
               :data-source="level1"
@@ -158,7 +158,6 @@ export default defineComponent({
      * }]
      */
     const level1 = ref() /*一级分类树，children属性是二级分类*/
-    level1.value = []
 
 
     /*数据查询 */
@@ -174,6 +173,9 @@ export default defineComponent({
           level1.value = Tool.array2Tree(docs.value,0)
           console.log("树形结构：",level1)
           docs.value = data.data
+
+          /*为选择树添加一个‘无’*/
+          treeSelectData.value.unshift({id:0,name:'none'})
         }else{
           message.error(data.message)
         }
@@ -181,11 +183,16 @@ export default defineComponent({
     }
 
 
+
+
     /*表单*/
     /*因为树选择组件的属性状态，会随着当前编辑的节点而变化，所以单独声明一个响应式变量*/
     const treeSelectData = ref()
     treeSelectData.value = []
-    const doc = ref({})
+    const doc = ref()
+    doc.value = []
+
+
     const modalVisible = ref(false);
     const modalLoading = ref(false)
     /* 创建富文本 */
@@ -195,6 +202,7 @@ export default defineComponent({
 
     const handleSave = ()=>{
       modalLoading.value = true
+      doc.value.content = editor.txt.html()
       axios.post("/doc/save",doc.value).then((response) =>{
         modalLoading.value = false
         const data = response.data /* data = commonResp */
@@ -211,7 +219,6 @@ export default defineComponent({
 
     /*将某节点及其子孙节点全部设置为disabled*/
     const setDisable = (treeSelectData : any, id:any) =>{
-      console.log("-------" + treeSelectData,id)
       /*遍历数组，及遍历某一层节点*/
       for(let i = 0; i < treeSelectData.length; i++){
         const node = treeSelectData[i]
@@ -237,38 +244,12 @@ export default defineComponent({
         }
       }
     }
-    /*编辑*/
-    const edit = (record:any) =>{
-      modalVisible.value = true
-      doc.value = Tool.copy(record)
 
-      /*不能选择当前节点及其所有子孙节点，作为父节点，会使树断开*/
-      treeSelectData.value = Tool.copy(level1.value)
-      setDisable(treeSelectData.value,record.id)
-
-      /*为选择树添加一个‘无’*/
-      treeSelectData.value.unshift({id:'0',value:'none'})
-
-
-    }
-
-    /*新增*/
-    const add = () =>{
-      modalVisible.value = true
-      doc.value = {
-        ebookId:route.query.ebookId
-      }
-      treeSelectData.value = Tool.copy(level1.value)
-      treeSelectData.value.unshift({id:'0',value:'none'})
-
-
-
-    }
     const deleteIds: Array<string> = []
     const deleteNames: Array<string> = []
     /*将某节点及其子孙节点全部设置为disabled*/
     const getDeleteIds = (treeSelectData : any, id:any) =>{
-       /* console.log("-------" + treeSelectData,id) */
+      /* console.log("-------" + treeSelectData,id) */
       /*遍历数组，及遍历某一层节点*/
       for(let i = 0; i < treeSelectData.length; i++){
         const node = treeSelectData[i]
@@ -296,6 +277,51 @@ export default defineComponent({
         }
       }
     }
+
+    /*内容查询 */
+    const handleQueryContent = () =>{
+      loading.value = true
+      level1.value = []
+      axios.get("/doc/find-content?%E6%95%99%E7%A8%8B" + doc.value.id).then((response) =>{
+        loading.value = false
+        const data = response.data
+        /*如果成功的话就出现提示*/
+        if(data.code === 200){
+          editor.txt.html(data.data)
+        }else{
+          message.error(data.message)
+        }
+      })
+    }
+
+    /*编辑*/
+    const edit = (record:any) =>{
+      modalVisible.value = true
+      doc.value = Tool.copy(record)
+      handleQueryContent()
+      /*不能选择当前节点及其所有子孙节点，作为父节点，会使树断开*/
+      treeSelectData.value = Tool.copy(level1.value)
+      setDisable(treeSelectData.value,record.id)
+
+      /*为选择树添加一个‘无’*/
+      treeSelectData.value.unshift({id:0,name:'none'})
+
+
+    }
+
+    /*新增*/
+    const add = () =>{
+      modalVisible.value = true
+      doc.value = {
+        ebookId:route.query.ebookId
+      }
+      treeSelectData.value = Tool.copy(level1.value) || []
+      treeSelectData.value.unshift({id:0,name:'none'})
+
+
+
+    }
+
     /*删除*/
     const handleDelete = (id:number)=>{
       /* console.log("level.value,id") */
