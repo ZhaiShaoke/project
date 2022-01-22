@@ -134,6 +134,7 @@ export default defineComponent({
     /*数据查询 */
     const handleQuery = () =>{
       loading.value = true
+      level1.value = []
       axios.get("/category/all?%E6%95%99%E7%A8%8B").then((response) =>{
         loading.value = false
         const data = response.data
