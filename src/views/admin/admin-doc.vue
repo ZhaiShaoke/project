@@ -64,7 +64,7 @@
               v-model:value="doc.parent"
               style="width:100%"
               :dropdown-style="{maxHeight:'400px',overflow:'auto'}"
-              :tree-data="treeSelectDate"
+              :tree-data="treeSelectData"
               placeholder="Please select"
               tree-default-expand-all
               :replaceFileds="{title:'name',key:'id',value:'id'}"
@@ -72,19 +72,11 @@
 
           </a-tree-select>
         </a-form-item>
-        <a-form-item label="父分类">
-          <a-select
-              ref="select"
-              v-model:value="doc.parent"
-          >
-            <a-select-option value="0">none</a-select-option>
-            <a-select-option v-for="c in level1" :key="c.id" value="c.id" :disabled="doc.id === c.id">
-              {{c.name}}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
         <a-form-item label="顺序">
           <a-input v-model:value="doc.sort"/>
+        </a-form-item>
+        <a-form-item label="内容">
+          <div id="content"></div>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -99,20 +91,20 @@ import {message, Modal} from 'ant-design-vue'
 import {Tool} from "../../../util/tool";
 import {useRoute} from "vue-router";
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
-
+import E from "wangeditor"
 
 
 export default defineComponent({
   name: 'AdminDoc',
   setup(){
     const route = useRoute()
-    console.log("路由",route)
-    console.log("route.path",route.path)
+    /* console.log("路由",route) */
+    /* console.log("route.path",route.path) */
     console.log("route.query",route.query)
-    console.log("route.params",route.params)
-    console.log("route.fullPath",route.fullPath)
-    console.log("route.name",route.name)
-    console.log("route.meta",route.meta)
+    /* console.log("route.params",route.params) /*
+    /* console.log("route.fullPath",route.fullPath) */
+    /* console.log("route.name",route.name) */
+    /* console.log("route.meta",route.meta) */
     const param = ref()
     param.value = {}
     const docs = ref()
@@ -181,6 +173,10 @@ export default defineComponent({
     const doc = ref({})
     const modalVisible = ref(false);
     const modalLoading = ref(false)
+    /* 创建富文本 */
+    const editor = new E("#content")
+
+
     const handleModalOk = ()=>{
       modalLoading.value = true
       axios.post("/doc/save",doc.value).then((response) =>{
@@ -236,6 +232,10 @@ export default defineComponent({
 
       /*为选择树添加一个‘无’*/
       treeSelectData.value.unshift({id:'0',value:'none'})
+
+      setTimeout(()=>{
+        editor.create()
+      })
     }
 
     /*新增*/
@@ -247,6 +247,9 @@ export default defineComponent({
       treeSelectData.value = Tool.copy(level1.value)
       treeSelectData.value.unshift({id:'0',value:'none'})
 
+      setTimeout(()=>{
+        editor.create()
+      })
 
     }
     const deleteIds: Array<string> = []
@@ -309,7 +312,6 @@ export default defineComponent({
 
     onMounted(()=>{
         handleQuery()
-
     });
 
     return{
