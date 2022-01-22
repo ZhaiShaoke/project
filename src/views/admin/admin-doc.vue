@@ -3,83 +3,90 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <p>
-        <a-form layout="inline" :model="param"
-        >
-          <a-form-item>
-            <a-button type="primary" @click="handleQuery()">
-              查询
-            </a-button>
-          </a-form-item>
-          <a-form-item>
-             <a-button type="primary" @click="add()">
-                新增
-             </a-button>
-          </a-form-item>
-        </a-form>
-      </p>
-      <a-table
-          :columns="columns"
-          :row-key="record => record.id"
-          :data-source="level1"
-          :pagination="false"
-          :loading="loading"
-      >
-        <template #cover="{ text: cover }">
-          <img v-if="cover" :src="cover" alt="avatar" />
-        </template>
-        <template v-slot:action="{ text, record }">
-          <a-space size="small">
-            <a-button type="primary" @click="edit(record)">
-              编辑
-            </a-button>
-            <a-popconfirm
-                title="Are you sure you want to delete it? It cannot be restored after deletion."
-                ok-text="Yes"
-                cancel-text="No"
-                @confirm="handleDelete(record.id)"
+      <a-row>
+        <a-col :span="12">
+          <p>
+            <a-form layout="inline" :model="param"
             >
-              <a-button type="danger">
-                删除
-              </a-button>
-            </a-popconfirm>
+              <a-form-item>
+                <a-button type="primary" @click="handleQuery()">
+                  查询
+                </a-button>
+              </a-form-item>
+              <a-form-item>
+                <a-button type="primary" @click="add()">
+                  新增
+                </a-button>
+              </a-form-item>
+            </a-form>
+          </p>
+          <a-table
+              :columns="columns"
+              :row-key="record => record.id"
+              :data-source="level1"
+              :pagination="false"
+              :loading="loading"
+          >
+            <template #cover="{ text: cover }">
+              <img v-if="cover" :src="cover" alt="avatar" />
+            </template>
+            <template v-slot:action="{ text, record }">
+              <a-space size="small">
+                <a-button type="primary" @click="edit(record)">
+                  编辑
+                </a-button>
+                <a-popconfirm
+                    title="Are you sure you want to delete it? It cannot be restored after deletion."
+                    ok-text="Yes"
+                    cancel-text="No"
+                    @confirm="handleDelete(record.id)"
+                >
+                  <a-button type="danger">
+                    删除
+                  </a-button>
+                </a-popconfirm>
 
-          </a-space>
-        </template>
-      </a-table>
+              </a-space>
+            </template>
+          </a-table>
+        </a-col>
+        <a-col :span="12">
+          <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+            <a-form-item label="名称">
+              <a-input v-model:value="doc.name" />
+            </a-form-item>
+            <a-form-item label="父文档">
+              <a-tree-select
+                  v-model:value="doc.parent"
+                  style="width:100%"
+                  :dropdown-style="{maxHeight:'400px',overflow:'auto'}"
+                  :tree-data="treeSelectData"
+                  placeholder="Please select"
+                  tree-default-expand-all
+                  :replaceFileds="{title:'name',key:'id',value:'id'}"
+              >
+
+              </a-tree-select>
+            </a-form-item>
+            <a-form-item label="顺序">
+              <a-input v-model:value="doc.sort"/>
+            </a-form-item>
+            <a-form-item label="内容">
+              <div id="content"></div>
+            </a-form-item>
+          </a-form>
+        </a-col>
+      </a-row>
+
     </a-layout-content>
   </a-layout>
 
 
-    <a-modal
+<!--    <a-modal
         v-model:visible="modalVisible"
         :contrim-loading="modalLoading"
         title="Document form" @ok="handleModalOk">
-      <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-        <a-form-item label="名称">
-          <a-input v-model:value="doc.name" />
-        </a-form-item>
-        <a-form-item label="父文档">
-          <a-tree-select
-              v-model:value="doc.parent"
-              style="width:100%"
-              :dropdown-style="{maxHeight:'400px',overflow:'auto'}"
-              :tree-data="treeSelectData"
-              placeholder="Please select"
-              tree-default-expand-all
-              :replaceFileds="{title:'name',key:'id',value:'id'}"
-          >
-
-          </a-tree-select>
-        </a-form-item>
-        <a-form-item label="顺序">
-          <a-input v-model:value="doc.sort"/>
-        </a-form-item>
-        <a-form-item label="内容">
-          <div id="content"></div>
-        </a-form-item>
-      </a-form>
-    </a-modal>
+    </a-modal>-->
 
 </template>
 
