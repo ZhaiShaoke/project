@@ -82,12 +82,23 @@
             <a-form-item >
               <a-input v-model:value="doc.sort" placeholder="顺序"/>
             </a-form-item>
-            <a-form-item label="内容">
+
+            <a-form-item>
+              <a-button type="primary" @click="handlePreviewContent()">
+                <EyeOutlined />  内容预览
+              </a-button>
+            </a-form-item>
+
+            <a-form-item>
               <div id="content"></div>
             </a-form-item>
           </a-form>
         </a-col>
       </a-row>
+
+      <a-drawer width="900" placement="right"  :closeable="false" :visable="drawerVisible" @close="onDrawerClose">
+        <div class="wangeditor" :innerHtml="previewHtml"></div>
+      </a-drawer>
 
     </a-layout-content>
   </a-layout>
@@ -129,6 +140,9 @@ export default defineComponent({
     param.value = {}
     const docs = ref()
 
+    /*因为树选择组件的属性状态，会随着当前编辑的节点而变化，所以单独声明一个响应式变量*/
+    const treeSelectData = ref()
+    treeSelectData.value = []
 
     const loading = ref(false)
 
@@ -160,20 +174,25 @@ export default defineComponent({
     const level1 = ref() /*一级分类树，children属性是二级分类*/
 
 
+
     /*数据查询 */
     const handleQuery = () =>{
       loading.value = true
       level1.value = []
-      axios.get("/doc/all?%E6%95%99%E7%A8%8B").then((response) =>{
+      axios.get("/doc/all?%E6%95%99%E7%A8%8B" + route.query.ebookId).then((response) =>{
         loading.value = false
         const data = response.data
         /*如果成功的话就出现提示*/
         if(data.code === 200){
+          docs.value = data.data
+
           level1.value = []
           level1.value = Tool.array2Tree(docs.value,0)
           console.log("树形结构：",level1)
-          docs.value = data.data
 
+
+          /* 父文档下拉框初始化,相当于点击新增 */
+          treeSelectData.value = Tool.copy(level1.value)
           /*为选择树添加一个‘无’*/
           treeSelectData.value.unshift({id:0,name:'none'})
         }else{
@@ -186,11 +205,11 @@ export default defineComponent({
 
 
     /*表单*/
-    /*因为树选择组件的属性状态，会随着当前编辑的节点而变化，所以单独声明一个响应式变量*/
-    const treeSelectData = ref()
-    treeSelectData.value = []
+
     const doc = ref()
-    doc.value = []
+    doc.value = {
+      ebookId : route.query.ebookId
+    }
 
 
     const modalVisible = ref(false);
@@ -353,6 +372,19 @@ export default defineComponent({
       });
     };
 
+
+    /*   富文本预览   */
+    const drawerVisible = ref(false)
+    const previewHtml = ref()
+    const handlePreviewContent = () =>{
+      const html = editor.txt.html();
+      previewHtml.value = html
+      drawerVisible.value = true
+    }
+    const onDrawerClose = () =>{
+      drawerVisible.value = false
+    }
+
     onMounted(()=>{
         handleQuery()
         editor.create()
@@ -375,7 +407,13 @@ export default defineComponent({
       handleSave,
       handleDelete,
 
-      treeSelectData
+      treeSelectData,
+
+      drawerVisible,
+      previewHtml,
+      handlePreviewContent,
+      onDrawerClose,
+
     }
 
 
