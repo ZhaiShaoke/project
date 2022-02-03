@@ -16,7 +16,7 @@
         </a-tree>
       </a-col>
       <a-col :span="18">
-        <div class="wangeditor" :innerHtml="html"></div>
+        <div  class = "wangeditor" :innerHTML="html"></div>
       </a-col>
     </a-row>
 
@@ -55,7 +55,6 @@ export default defineComponent({
 
     /*内容查询 */
     const handleQueryContent = (id:number) =>{
-      level1.value = []
       axios.get("/doc/find-content?%E6%95%99%E7%A8%8B" + id).then((response) =>{
         const data = response.data
         /*如果成功的话就出现提示*/

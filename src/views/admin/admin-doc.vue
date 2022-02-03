@@ -96,8 +96,8 @@
         </a-col>
       </a-row>
 
-      <a-drawer width="900" placement="right"  :closeable="false" :visable="drawerVisible" @close="onDrawerClose">
-        <div class="wangeditor" :innerHtml="previewHtml"></div>
+      <a-drawer width="900" placement="right"  :closable="false" :visable="drawerVisible" @close="onDrawerClose">
+        <div class="wangeditor" :innerHTML="previewHtml"></div>
       </a-drawer>
 
     </a-layout-content>
@@ -194,7 +194,7 @@ export default defineComponent({
           /* 父文档下拉框初始化,相当于点击新增 */
           treeSelectData.value = Tool.copy(level1.value)
           /*为选择树添加一个‘无’*/
-          treeSelectData.value.unshift({id:0,name:'none'})
+          treeSelectData.value.unshift({id:0,name:'无'})
         }else{
           message.error(data.message)
         }
@@ -300,10 +300,7 @@ export default defineComponent({
 
     /*内容查询 */
     const handleQueryContent = () =>{
-      loading.value = true
-      level1.value = []
       axios.get("/doc/find-content?%E6%95%99%E7%A8%8B" + doc.value.id).then((response) =>{
-        loading.value = false
         const data = response.data
         /*如果成功的话就出现提示*/
         if(data.code === 200){
