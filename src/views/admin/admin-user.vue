@@ -44,6 +44,9 @@
               </a-button>
             </router-link>
             <a-button type="primary" @click="edit(record)">
+              重置密码
+            </a-button>
+            <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
             <a-popconfirm
@@ -64,29 +67,50 @@
   </a-layout>
 
 
-    <a-modal
-        v-model:visible="modalVisible"
-        :contrim-loading="modalLoading"
-        title="EBook Form" @ok="handleModalOk">
-      <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-        <a-form-item label="封面">
-          <a-input v-model:value="user.cover" />
-        </a-form-item>
-        <a-form-item label="名称">
-          <a-input v-model:value="user.name" />
-        </a-form-item>
-        <a-form-item label="分类">
-          <a-cascader
-            v-model:value="categoryIds"
-            :filed-names="{label:'name',value:'id',children:'children'}"
-            :options="level1"
-            />
-        </a-form-item>
-        <a-form-item label="描述">
-          <a-input v-model:value="user.description" type="textarea" />
-        </a-form-item>
-      </a-form>
-    </a-modal>
+  <a-modal
+      title="用户表单"
+      v-model:visible="modalVisible"
+      :confirm-loading="modalLoading"
+      @ok="handleModalOk"
+  >
+    <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+      <a-form-item label="登陆名">
+        <a-input v-model:value="user.loginName" :disabled="!!user.id"/>
+      </a-form-item>
+      <a-form-item label="昵称">
+        <a-input v-model:value="user.name" />
+      </a-form-item>
+      <a-form-item label="密码" v-show="!user.id">
+        <a-input v-model:value="user.password" type="password"/>
+      </a-form-item>
+    </a-form>
+  </a-modal>
+
+  <a-modal
+      title="重置密码"
+      v-model:visible="resetModalVisible"
+      :confirm-loading="resetModalLoading"
+      @ok="handleModalOk"
+  >
+    <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+      <a-form-item label="新密码">
+        <a-input v-model:value="user.password"/>
+      </a-form-item>
+    </a-form>
+  </a-modal>
+
+  <a-modal
+      title="重置密码"
+      v-model:visible="resetModalVisible"
+      :confirm-loading="resetModalLoading"
+      @ok="handleResetModalOk"
+  >
+    <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+      <a-form-item label="新密码">
+        <a-input v-model:value="user.password" type="password"/>
+      </a-form-item>
+    </a-form>
+  </a-modal>
 
 </template>
 
@@ -97,7 +121,8 @@ import axios from 'axios';
 import {message} from 'ant-design-vue'
 import {Tool} from "../../../util/tool";
 
-const listData:any = [];
+declare let hexMd5: any;
+declare let KEY:any;
 
 export default defineComponent({
   name: 'AdminUser',
@@ -190,10 +215,13 @@ export default defineComponent({
     const user = ref()
     const modalVisible = ref(false);
     const modalLoading = ref(false)
+
     const handleModalOk = ()=>{
+
       modalLoading.value = true
-      user.value.category1Id = categoryIds.value[0]
-      user.value.category2Id = categoryIds.value[1]
+
+      user.value.password = hexMd5(user.value.password + KEY)
+
       axios.post("/user/save",user.value).then((response) =>{
         modalLoading.value = false
         const data = response.data /* data = commonResp */
@@ -215,7 +243,6 @@ export default defineComponent({
     const edit = (record:any) =>{
       modalVisible.value = true
       user.value = Tool.copy(record)
-      categoryIds.value = [user.value.category1Id,user.value.category2Id]
     }
 
 
@@ -256,6 +283,45 @@ export default defineComponent({
       return result
     }
 
+    /*重置密码*/
+
+    /*
+    * 数组[100,101]对应：前端开发 / vue
+    * */
+    const resetModalVisible = ref(false);
+    const resetModalLoading = ref(false)
+
+    const handleResetModalOk = ()=>{
+
+      resetModalLoading.value = true
+
+      user.value.password = hexMd5(user.value.password + KEY)
+
+      axios.post("/user/reset-password",user.value).then((response) =>{
+        resetModalLoading.value = false
+        const data = response.data /* data = commonResp */
+        if(data.code === 200){
+          resetModalVisible.value = false
+          /*modalLoading.value = false*/
+          /*重新加载*/
+          handleQuery({
+            page:pagination.value.current,
+            size:pagination.value.pageSize,
+          })
+        }else{
+          message.error(data.message)
+        }
+      })
+    }
+
+    /*重置密码*/
+    const resetPassword = (record:any) =>{
+      modalVisible.value = true
+      user.value = Tool.copy(record)
+      user.value.password = null
+    }
+
+
     onMounted(()=>{
       handleQuery({
         page:1,
@@ -281,6 +347,11 @@ export default defineComponent({
       modalVisible,
       modalLoading,
       handleModalOk,
+
+      resetModalVisible,
+      resetModalLoading,
+      handleResetModalOk,
+
       categoryIds,
       level1,
 
