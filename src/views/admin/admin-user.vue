@@ -255,7 +255,7 @@ export default defineComponent({
 
     /*删除*/
     const handleDelete = (id:number)=>{
-      axios.delete("/user/delete/" + id).then((response) =>{
+      axios.delete("/user/delete" + id).then((response) =>{
         const data = response.data /* data = commonResp */
         if(data.code === 200) {
           /*重新加载*/

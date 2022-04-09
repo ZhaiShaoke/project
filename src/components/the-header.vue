@@ -19,16 +19,28 @@
         <router-link to="/admin/category">Classified management</router-link>
       </a-menu-item>
 
-      <a-menu-item key="about">
+      <a-menu-item class = "about" key="about">
         <router-link to="/about">About Us</router-link>
       </a-menu-item>
 
-      <a class="login-menu" v-show="user.id" >
-        <span>您好: {{user.name}}</span>
+      <a class="login-menu" v-show="user.id">
+        <span>Hello,{{user.loginName}}</span>
       </a>
-      <a class="login-menu"  v-show="!user.id" @click="showLoginModal">
-        <span>登录</span>
+      <a class="login-menu" v-show="!user.id" @click="showLoginModal">
+        <span>Sign in</span>
       </a>
+
+      <a-popconfirm
+          title="Are you sure to log out?"
+          ok-text="Yes"
+          cancel-text="No"
+          @confirm="logout()"
+      >
+        <a class="login-menu" v-show="user.id">
+          <span>Sign out</span>
+        </a>
+      </a-popconfirm>
+
 
     </a-menu>
 
@@ -57,15 +69,12 @@ import { message } from 'ant-design-vue'
 import store from "@/store";
 
 
-
-
-
 export default defineComponent({
   name: 'the-header',
   setup() {
     //登录后保存
-    const user = ref()
-    user.value = {}
+    const user = computed(() => store.state.user)
+
 
     //用来登录
     const loginUser = ref({
@@ -81,7 +90,8 @@ export default defineComponent({
 
     /* 登录 */
     const login = () => {
-      console.log("开始登录")
+      console.log("Start login")
+      console.log(user)
       loginModalLoading.value = true
 
       axios.post('/user/login',loginUser.value).then((response) =>{
@@ -89,9 +99,23 @@ export default defineComponent({
         const data = response.data
         if(data.code === 200){
           loginModalVisible.value = false
-          message.success("登录成功！")
-          user.value = data.data
-          store.commit
+          message.success("Login successful！")
+          store.commit("setUser",data.data)
+          /* console.log(data) */
+          /*console.log(user.value) */
+        }else{
+          message.error(data.message)
+        }
+      })
+    }
+    /* 退出登录 */
+    const logout = () => {
+      console.log("Start logout")
+      axios.get('/user/login' + user.value.token).then((response) =>{
+        const data = response.data
+        if(data.code === 200){
+          message.success("Log out successful！")
+          store.commit("setUser",{})
         }else{
           message.error(data.message)
         }
@@ -105,7 +129,8 @@ export default defineComponent({
       showLoginModal,
       loginUser,
       login,
-      user
+      user,
+      logout
     }
   }
 });
@@ -117,17 +142,23 @@ export default defineComponent({
 .logo {
   width: 120px;
   height: 31px;
-  margin: 16px 28px 16px 0;
+  /*margin: 16px 28px 16px 0;*/
+
   float: left;
   color: white;
   font-size: 18px;
+
 }
 
-.login-menu {
-  float: right;
-  color: white;
-  padding-left: 10px;
+.login-menu{
+  color:white;
+  float:right;
+  padding-right:10px;
+
 }
+
+
+
 
 
 </style>

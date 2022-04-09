@@ -1,5 +1,5 @@
 <template>
   <div class="about">
-    <h1>E-book management</h1>
+    <h3>E-book management</h3>
   </div>
 </template>
