@@ -9,17 +9,17 @@
       <a-menu-item key="/">
         <router-link to="/">Home Page</router-link>
       </a-menu-item>
-      <a-menu-item key="admin/user">
+      <a-menu-item key="/admin/user" :style="user.id? {} : {display:'none'}">
         <router-link to="/admin/user">User management</router-link>
       </a-menu-item>
-      <a-menu-item key="admin/ebook">
+      <a-menu-item key="/admin/ebook" :style="user.id? {} : {display:'none'}">
         <router-link to="/admin/ebook">Electronic Book</router-link>
       </a-menu-item>
-      <a-menu-item key="admin/category">
-        <router-link to="/admin/category">Classified management</router-link>
+      <a-menu-item key="/admin/category" :style="user.id? {} : {display:'none'}">
+        <router-link to="/admin/category" >Classified management</router-link>
       </a-menu-item>
 
-      <a-menu-item class = "about" key="about">
+      <a-menu-item  key="/about">
         <router-link to="/about">About Us</router-link>
       </a-menu-item>
 
@@ -36,7 +36,7 @@
           cancel-text="No"
           @confirm="logout()"
       >
-        <a class="login-menu" v-show="user.id">
+        <a class="logout-menu" v-show="user.id">
           <span>Sign out</span>
         </a>
       </a-popconfirm>
@@ -108,19 +108,20 @@ export default defineComponent({
         }
       })
     }
-    /* 退出登录 */
+
+    //退出登录
     const logout = () => {
-      console.log("Start logout")
-      axios.get('/user/login' + user.value.token).then((response) =>{
-        const data = response.data
-        if(data.code === 200){
-          message.success("Log out successful！")
-          store.commit("setUser",{})
-        }else{
-          message.error(data.message)
+      console.log("退出登录开始");
+      axios.get('/user/logout/' + user.value.token).then((response) => {
+        const data = response.data;
+        if (data.code === 200) {
+          message.success("退出登录成功！");
+          store.commit("setUser", {});
+        } else {
+          message.error(data.message);
         }
-      })
-    }
+      });
+    };
 
 
     return {
@@ -143,18 +144,27 @@ export default defineComponent({
   width: 120px;
   height: 31px;
   /*margin: 16px 28px 16px 0;*/
-
   float: left;
   color: white;
   font-size: 18px;
+}
 
+.header{
+  position:relative;
 }
 
 .login-menu{
   color:white;
-  float:right;
+  position: absolute;
   padding-right:10px;
+  right:100px;
 
+}
+.logout-menu{
+  color:white;
+  position: absolute;
+  padding-right:10px;
+  right:20px;
 }
 
 

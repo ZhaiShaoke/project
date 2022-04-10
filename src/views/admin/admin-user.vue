@@ -30,20 +30,9 @@
           :loading="loading"
           @change="handleTableChange"
       >
-        <template #cover="{ text: cover }">
-          <img v-if="cover" :src="cover" alt="avatar" />
-        </template>
-        <template v-slot:category="{ text, record }">
-          <span>{{getCategoryName(record.category1Id)}} / {{getCategoryName(record.category2Id)}}</span>
-        </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
-            <router-link :to="'/admin/doc?userId=' + record.id">
-              <a-button type="primary" >
-                文档管理
-              </a-button>
-            </router-link>
-            <a-button type="primary" @click="edit(record)">
+            <a-button type="primary" @click="resetPassword(record)">
               重置密码
             </a-button>
             <a-button type="primary" @click="edit(record)">
@@ -59,7 +48,6 @@
                 删除
               </a-button>
             </a-popconfirm>
-
           </a-space>
         </template>
       </a-table>
@@ -121,8 +109,7 @@ import axios from 'axios';
 import {message} from 'ant-design-vue'
 import {Tool} from "../../../util/tool";
 
-declare let hexMd5: any;
-declare let KEY:any;
+
 
 export default defineComponent({
   name: 'AdminUser',
@@ -140,29 +127,16 @@ export default defineComponent({
 
     const columns = [
       {
-        title: '封面',
-        dataIndex: 'cover',
-        slots: { customRender: 'cover' }
+        title:'登录名',
+        dataIndex: 'loginName'
       },
       {
         title: '名称',
         dataIndex: 'name'
       },
       {
-        title: '分类',
-        slots: {customRender:'category'}
-      },
-      {
-        title: '文档数',
-        dataIndex: 'docCount'
-      },
-      {
-        title: '阅读数',
-        dataIndex: 'viewCount'
-      },
-      {
-        title: '点赞数',
-        dataIndex: 'voteCount'
+        title:'密码',
+        dataIndex: 'password'
       },
       {
         title: 'Action',
@@ -211,16 +185,13 @@ export default defineComponent({
     /*
     * 数组[100,101]对应：前端开发 / vue
     * */
-    const categoryIds = ref()
+
     const user = ref()
     const modalVisible = ref(false);
     const modalLoading = ref(false)
 
     const handleModalOk = ()=>{
-
       modalLoading.value = true
-
-      user.value.password = hexMd5(user.value.password + KEY)
 
       axios.post("/user/save",user.value).then((response) =>{
         modalLoading.value = false
@@ -263,25 +234,12 @@ export default defineComponent({
             page: pagination.value.current,
             size: pagination.value.pageSize,
           })
+        }else{
+          message.error(data.message)
         }
       })
     };
 
-    const level1 = ref() /*一级分类树，children属性是二级分类*/
-    let categorys: any;
-
-
-    const getCategoryName = (cid : number) =>{
-      /* console.log(cid)*/
-      let result = ""
-      categorys.forEach((item :any) =>{
-        if(item.id === cid){
-          /*return item.name  注意，这里直接return不起作用*/
-          result = item.name
-        }
-      })
-      return result
-    }
 
     /*重置密码*/
 
@@ -295,7 +253,6 @@ export default defineComponent({
 
       resetModalLoading.value = true
 
-      user.value.password = hexMd5(user.value.password + KEY)
 
       axios.post("/user/reset-password",user.value).then((response) =>{
         resetModalLoading.value = false
@@ -338,7 +295,7 @@ export default defineComponent({
       loading,
       handleTableChange,
       handleQuery,
-      getCategoryName,
+
 
       edit,
       add,
@@ -351,9 +308,7 @@ export default defineComponent({
       resetModalVisible,
       resetModalLoading,
       handleResetModalOk,
-
-      categoryIds,
-      level1,
+      resetPassword,
 
       handleDelete
     }
