@@ -38,7 +38,7 @@
         </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
-            <router-link :to="'/admin/doc?ebookId=' + record.id">
+            <router-link :to="'/admin/doc?ebookId='+record.id">
               <a-button type="primary" >
                 文档管理
               </a-button>
@@ -236,6 +236,8 @@ export default defineComponent({
             page: pagination.value.current,
             size: pagination.value.pageSize,
           })
+        }else{
+          message.error(data.message)
         }
       })
     };

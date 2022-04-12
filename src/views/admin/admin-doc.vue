@@ -6,8 +6,7 @@
       <a-row :gutter="24">
         <a-col :span="8" >
           <p>
-            <a-form layout="inline" :model="param"
-            >
+            <a-form layout="inline" :model="param">
               <a-form-item>
                 <a-button type="primary" @click="handleQuery()">
                   查询
@@ -21,14 +20,14 @@
             </a-form>
           </p>
           <a-table
-
+              v-if="level1.length > 0"
               :columns="columns"
               :row-key="record => record.id"
               :data-source="level1"
               :pagination="false"
               :loading="loading"
               size="small"
-              :defaultExpandAllRows="true"
+              :defaultExpandAllRows="false"
           >
             <template #name="{ text , record }">
              {{record.sort}} {{text}}
@@ -48,7 +47,6 @@
                     删除
                   </a-button>
                 </a-popconfirm>
-
               </a-space>
             </template>
           </a-table>
@@ -82,13 +80,11 @@
             <a-form-item >
               <a-input v-model:value="doc.sort" placeholder="顺序"/>
             </a-form-item>
-
             <a-form-item>
               <a-button type="primary" @click="handlePreviewContent()">
                 <EyeOutlined />  内容预览
               </a-button>
             </a-form-item>
-
             <a-form-item>
               <div id="content"></div>
             </a-form-item>
@@ -172,14 +168,14 @@ export default defineComponent({
      * }]
      */
     const level1 = ref() /*一级分类树，children属性是二级分类*/
-
+    level1.value = []
 
 
     /*数据查询 */
     const handleQuery = () =>{
       loading.value = true
       level1.value = []
-      axios.get("/doc/all?%E6%95%99%E7%A8%8B" + route.query.ebookId).then((response) =>{
+      axios.get("/doc/all/" + route.query.ebookId).then((response) =>{
         loading.value = false
         const data = response.data
         /*如果成功的话就出现提示*/
@@ -192,7 +188,7 @@ export default defineComponent({
 
 
           /* 父文档下拉框初始化,相当于点击新增 */
-          treeSelectData.value = Tool.copy(level1.value)
+          treeSelectData.value = Tool.copy(level1.value) || []
           /*为选择树添加一个‘无’*/
           treeSelectData.value.unshift({id:0,name:'无'})
         }else{
@@ -218,6 +214,7 @@ export default defineComponent({
     const editor = new E("#content")
     /* 设置富文本的层级,要不然会挡住下拉框 */
     editor.config.zIndex = 0
+    editor.config.uploadImgShowBase64 = true
 
     const handleSave = ()=>{
       modalLoading.value = true
@@ -300,7 +297,7 @@ export default defineComponent({
 
     /*内容查询 */
     const handleQueryContent = () =>{
-      axios.get("/doc/find-content?%E6%95%99%E7%A8%8B" + doc.value.id).then((response) =>{
+      axios.get("/doc/find-content/" + doc.value.id).then((response) =>{
         const data = response.data
         /*如果成功的话就出现提示*/
         if(data.code === 200){
@@ -346,10 +343,10 @@ export default defineComponent({
     /*删除*/
     const handleDelete = (id:number)=>{
       /* console.log("level.value,id") */
-      getDeleteIds(level1.value,id)
       /* 清空数组，否则多次删除时，数组会一直增加 */
       deleteNames.length = 0
       deleteIds.length = 0
+      getDeleteIds(level1.value,id)
       /* console.log(ids) */
       Modal.confirm({
         title: 'Important reminder',

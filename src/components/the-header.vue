@@ -72,11 +72,11 @@ import store from "@/store";
 export default defineComponent({
   name: 'the-header',
   setup() {
-    //登录后保存
+    /* 登录后保存 */
     const user = computed(() => store.state.user)
 
 
-    //用来登录
+     /* 用来登录 */
     const loginUser = ref({
       loginName: "test",
       password: "123456abc"
@@ -109,7 +109,7 @@ export default defineComponent({
       })
     }
 
-    //退出登录
+    /* 退出登录 */
     const logout = () => {
       console.log("退出登录开始");
       axios.get('/user/logout/' + user.value.token).then((response) => {

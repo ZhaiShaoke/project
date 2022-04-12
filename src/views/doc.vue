@@ -1,26 +1,35 @@
 <template>
-  <a-layout-content
-      :style="{background:'#fff',padding:'24px',margin:0,minHeitht:'280px'}"
-  >
-    <h3 v-if="level1.length === 0">对不起，找不到该文档！</h3>
-    <a-row>
-      <a-col :span="6">
-        <a-tree
-            v-if="level1.length > 0"
-            :tree-data="level1"
-            @select="onSelect"
-            :replaceFields="{title: 'name', key: 'id', value: 'id'}"
-            :defaultExpandAll="true"
-            :defaultSelectedKeys="defaultSelectedKey"
-        >
-        </a-tree>
-      </a-col>
-      <a-col :span="18">
-        <div  class = "wangeditor" :innerHTML="html"></div>
-      </a-col>
-    </a-row>
+  <a-layout>
+    <a-layout-content
+        :style="{background:'#fff',padding:'24px',margin:0,minHeight:'280px'}"
+    >
+      <h3 v-if="level1.length === 0">对不起，找不到该文档！</h3>
+      <a-row>
+        <a-col :span="6">
+          <a-tree
+              v-if="level1.length > 0"
+              :tree-data="level1"
+              @select="onSelect"
+              :replaceFields="{title: 'name', key: 'id', value: 'id'}"
+              :defaultExpandAll="true"
+              :defaultSelectedKeys="defaultSelectedKeys"
+          >
+          </a-tree>
+        </a-col>
+        <a-col :span="18">
+        <!--    doc文档中按照电子书的id显示电子书时增加点赞数和阅读数，并加一条Divider分割线      -->
+          <h2>{{doc.name}}</h2>
+          <div>
+            <span>阅读数:    {{doc.viewCount}}</span> &nbsp;&nbsp;
+            <span>点赞数:    {{doc.voteCount}}</span>
+          </div>
+          <a-divider style="height:3px;background-color: #9999cc"/>
+          <div  class = "wangeditor" :innerHTML="html"></div>
+        </a-col>
+      </a-row>
 
-  </a-layout-content>
+    </a-layout-content>
+  </a-layout>
 </template>
 
 <script lang="ts">
@@ -37,7 +46,7 @@ export default defineComponent({
     const route = useRoute();
     const docs = ref();
     const html = ref()
-    const defaultSelectedKeys =ref()
+    const defaultSelectedKeys = ref()
     defaultSelectedKeys.value = []
     /**
      * 一级文档树，children属性就是二级文档
@@ -50,12 +59,17 @@ export default defineComponent({
      *   }]
      * }]
      */
+    /* 当前选中的文档 */
+    const doc = ref()
+    doc.value = {}
+
+
     const level1 = ref(); // 一级文档树，children属性就是二级文档
     level1.value = [];
 
     /*内容查询 */
     const handleQueryContent = (id:number) =>{
-      axios.get("/doc/find-content?%E6%95%99%E7%A8%8B" + id).then((response) =>{
+      axios.get("/doc/find-content/" + id).then((response) =>{
         const data = response.data
         /*如果成功的话就出现提示*/
         if(data.code === 200){
@@ -69,7 +83,7 @@ export default defineComponent({
      * 数据查询
      **/
     const handleQuery = () => {
-      axios.get("/doc/all?%E6%95%99%E7%A8%8B" + route.query.ebookId).then((response) => {
+      axios.get("/doc/all/" + route.query.ebookId).then((response) => {
         const data = response.data;
         if (data.code === 200) {
           docs.value = data.data;
@@ -77,9 +91,12 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value, 0);
 
+          /* 选中第一个节点，加载第一个节点的内容 */
           if(Tool.isNotEmpty(level1)){
             defaultSelectedKeys.value = [level1.value[0].id]
             handleQueryContent(level1.value[0].id)
+            /* 初始显示文档信息  把第一个节点的信息赋给响应式变量 */
+            doc.value = level1.value[0]
           }
         } else {
           message.error(data.message);
@@ -93,6 +110,8 @@ export default defineComponent({
       console.log('selected',selectedKeys,info)
       /* selectedKeys 是当前选中的，它是一个数组 */
       if(Tool.isNotEmpty(selectedKeys)){
+        /*  选中某一节点时，加载该节点的文档信息 */
+        doc.value = info.selectedNodes[0].props
         /* 加载内容 */
         handleQueryContent(selectedKeys[0])
       }
@@ -106,7 +125,8 @@ export default defineComponent({
       level1,
       html,
       onSelect,
-      defaultSelectedKeys
+      defaultSelectedKeys,
+      doc
     }
   }
 });

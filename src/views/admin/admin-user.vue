@@ -127,7 +127,7 @@ export default defineComponent({
 
     const columns = [
       {
-        title:'登录名',
+        title:'登陆名',
         dataIndex: 'loginName'
       },
       {
@@ -154,7 +154,7 @@ export default defineComponent({
         params:{
           page:params.page,
           size:params.size,
-          name:param.value.name
+          loginName:param.value.loginName
         }
       }).then((response) =>{
         loading.value = false
@@ -226,7 +226,7 @@ export default defineComponent({
 
     /*删除*/
     const handleDelete = (id:number)=>{
-      axios.delete("/user/delete" + id).then((response) =>{
+      axios.delete("/user/delete/" + id).then((response) =>{
         const data = response.data /* data = commonResp */
         if(data.code === 200) {
           /*重新加载*/

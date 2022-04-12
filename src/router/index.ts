@@ -7,6 +7,8 @@ import AdminDoc from '../views/admin/admin-doc.vue'
 import Doc from '../views/doc.vue'
 import store from "@/store";
 import {Tool} from "../../util/tool";
+import About from "../views/about.vue"
+
 
 
 const routes: Array<RouteRecordRaw> = [
@@ -23,7 +25,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/about',
     name: 'About',
-    component: () => import(/* webpackChunkName: "about" */ '../views/about.vue')
+    component: About
   },
   {
     path: '/admin/user',
@@ -67,7 +69,7 @@ const router = createRouter({
 
 /* 路由登录拦截 逻辑固定在Vue2和Vue3中都支持，可以直接使用，loginRequire是自定义的  */
 router.beforeEach((to,from,next)=>{
-  //要不要对meta.loginRequire属性做监控拦截
+  /* 要不要对meta.loginRequire属性做监控拦截  */
   if(to.matched.some(function(item){
     console.log(item,"是否需要登录校验：",item.meta.loginRequire)
     return item.meta.loginRequire

@@ -19,11 +19,13 @@
         </a-form>
       </p>
       <a-table
+          v-if="level1.length > 0"
           :columns="columns"
           :row-key="record => record.id"
           :data-source="level1"
           :pagination="false"
           :loading="loading"
+          :defaultExpandAllRows="false"
       >
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar" />
@@ -65,7 +67,7 @@
               v-model:value="category.parent"
           >
             <a-select-option value="0">none</a-select-option>
-            <a-select-option v-for="c in level1" :key="c.id" value="c.id" :disabled="category.id === c.id">
+            <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="category.id === c.id">
               {{c.name}}
             </a-select-option>
           </a-select>
@@ -75,7 +77,6 @@
         </a-form-item>
       </a-form>
     </a-modal>
-
 </template>
 
 
@@ -85,7 +86,6 @@ import axios from 'axios';
 import {message} from 'ant-design-vue'
 import {Tool} from "../../../util/tool";
 
-const listData:any = [];
 
 export default defineComponent({
   name: 'AdminCategory',
@@ -93,20 +93,18 @@ export default defineComponent({
     const param = ref()
     param.value = {}
     const categorys = ref()
-
-
-  const loading = ref(false)
+    const loading = ref(false)
 
     const columns = [
       {
         title: '名称',
         dataIndex: 'name'
       },
-      {
+      /* {
         title: '父分类',
         key:'parent',
         dataIndex:'parent'
-      },
+      }, */
       {
         title: '顺序',
         dataIndex: 'sort'
@@ -130,6 +128,7 @@ export default defineComponent({
      * }]
      */
     const level1 = ref() /*一级分类树，children属性是二级分类 */
+    level1.value = []
 
     /*数据查询 */
     const handleQuery = () =>{
@@ -140,10 +139,12 @@ export default defineComponent({
         const data = response.data
         /*如果成功的话就出现提示*/
         if(data.code === 200){
+          categorys.value = data.data
+          console.log("原始数组:",categorys.value)
+
           level1.value = []
           level1.value = Tool.array2Tree(categorys.value,0)
           console.log("树形结构：",level1)
-          categorys.value = data.data
         }else{
           message.error(data.message)
         }
@@ -190,6 +191,8 @@ export default defineComponent({
         if(data.code === 200) {
           /*重新加载*/
           handleQuery()
+        }else{
+          message.error(data.message)
         }
       })
     };
@@ -201,11 +204,12 @@ export default defineComponent({
 
     return{
       param,
-      /* categorys, */
+      /* categorys*/
       level1,
       columns,
       loading,
       handleQuery,
+
       edit,
       add,
 
