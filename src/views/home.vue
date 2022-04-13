@@ -31,13 +31,14 @@
     >
       <!-- 欢迎页面 -->
       <div class = "welcome" v-show = "isShowWelcome">
-        <h1>Welcome to the knowledge base</h1>
+        <the-welcome></the-welcome>
       </div>
       <!--  电子书    -->
       <a-list v-show="!isShowWelcome" item-layout="vertical" size="large" :grid="{gutter:20, columns:3}"
                :data-source="ebooks">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
+                <!--    每个电子书下面的点赞和阅读数的时事更新        -->
 <!--            <template #actions>-->
 <!--              <span v-for="{ type, text } in actions" :key="type">-->
 <!--                <component v-bind:is="type" style="margin-right: 8px" />-->
@@ -78,13 +79,14 @@ import { defineComponent ,onMounted,ref,reactive,toRef} from 'vue';
 import axios from 'axios';
 import {message} from "ant-design-vue";
 import {Tool} from "../../util/tool";
+import  TheWelcome from "../components/the-welcome.vue"
 
 
 
 export default defineComponent({
   name: 'Home',
   components:{
-
+    TheWelcome
   },
   setup(){
     console.log("setup");
@@ -105,10 +107,10 @@ export default defineComponent({
           console.log("原始数组：", categorys);
 
           /* 加载完分类后，将侧边栏全部展开 */
-          // openKeys.value = []
-          // for(let i = 0; i < categorys.length; i++){
-          //   openKeys.value.push(categorys[i].id)
-          // }
+          /* openKeys.value = []
+          for(let i = 0; i < categorys.length; i++){
+            openKeys.value.push(categorys[i].id)
+          } */
 
 
           level1.value = [];

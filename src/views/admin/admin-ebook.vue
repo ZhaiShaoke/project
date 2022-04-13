@@ -97,7 +97,6 @@ import axios from 'axios';
 import {message} from 'ant-design-vue'
 import {Tool} from "../../../util/tool";
 
-const listData:any = [];
 
 export default defineComponent({
   name: 'AdminEbook',

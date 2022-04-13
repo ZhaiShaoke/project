@@ -25,6 +25,12 @@
           </div>
           <a-divider style="height:3px;background-color: #9999cc"/>
           <div  class = "wangeditor" :innerHTML="html"></div>
+          <!--   增加文章点赞功能       -->
+          <div class="vote-div">
+            <a-button type="primary" shape="round" :size="large" @click="vote">
+              <template #icon><LikeOutlined/>&nbsp;点赞：{{doc.voteCount}}</template>
+            </a-button>
+          </div>
         </a-col>
       </a-row>
 
@@ -117,6 +123,19 @@ export default defineComponent({
       }
     }
 
+    /* 点赞  文章下面的点赞，点赞的同时文章上方的点赞数+1 */
+    const vote = () => {
+      axios.get('/doc/vote/' + doc.value.id).then((response)=>{
+        const data = response.data
+        if(data.code === 200){
+          doc.value.voteCount++
+         /* console.log('********',doc.value)  */
+        }else{
+          message.error(data.message)
+        }
+      })
+    }
+
     onMounted(() => {
       handleQuery();
     });
@@ -126,7 +145,8 @@ export default defineComponent({
       html,
       onSelect,
       defaultSelectedKeys,
-      doc
+      doc,
+      vote
     }
   }
 });
@@ -188,5 +208,11 @@ export default defineComponent({
     font-size: 16px !important;
     font-weight: 600 ;
 
+  }
+
+  /*点赞 */
+  .vote-div{
+    padding: 15px;
+    text-align: center;
   }
 </style>
