@@ -2,40 +2,34 @@
   <a-layout>
     <a-layout-content :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }">
       <div class="about">
-        <h2>我是甲蛙，13年Java全栈，慕课网讲师</h2>
-        <div><b>专注Java全栈技术分享，汇总13年实战经验</b></div>
+        <h2>这里是ydck知识库管理系统</h2>
+        <div><b>超多图书，等你来</b></div>
         <div>
           <b>项目实战：
-            <a href="https://coding.imooc.com/class/474.html" target="_blank">
               《SpringBoot知识体系+Vue3全家桶 前后端分离 实战WIKI知识库系统》
+          </b>
+        </div>
+        <div>
+          <b>小组成员：
+            崔嘉仪 董世苹 于倩倩  翟少珂
+          </b>
+        </div>
+        <div>
+          <b>前端代码网址
+            <a href="https://github.com/ZhaiShaoke/project" target="_blank">
+              《Vue3全家桶 + Ant Design Vue》
             </a>
           </b>
         </div>
         <div>
-          <b>项目实战：
-            <a href="https://coding.imooc.com/class/416.html" target="_blank">
-              《Spring Cloud + Vue 前后端分离 开发企业级在线视频课程系统》
-            </a>
-          </b>
-        </div>
-        <div>
-          <b>免费课程：
-            <a href="https://www.imooc.com/learn/1160" target="_blank">
-              《开发工具IDEA从入门到爱不释手》
+          <b>后端代码网址
+            <a href="https://github.com/ZhaiShaoke/project" target="_blank">
+              《SpringBoot + Mybatis + Redis + MongoDB》
             </a>
           </b>
         </div>
         <br>
-        <div><b>QQ：82144921，<span style="color: rgb(194, 79, 74)">阿里云产品使用咨询、购买优惠</span>，加QQ，备注：阿里云</b></div>
-        <div><b>微信号：jiawa1986</b></div>
-        <div><b>QQ群：174545069，Java全栈交流群</b></div>
-        <div><b>个人全栈技术博客：
-          <a href="http://www.jiawablog.com" target="_blank">甲蛙博客</a></b>
-        </div>
-        <div style="color: rgb(194, 79, 74)"><b>公众号：甲蛙全栈，扫码关注</b></div>
-        <div>
-          <img src="/image/jiawaquanzhan.jpg">
-        </div>
+        <div><b>QQ：2509551708，<span style="color: rgb(194, 79, 74)">阿里云产品使用咨询、购买优惠</span>，加QQ，备注：ykdc</b></div>
       </div>
     </a-layout-content>
   </a-layout>

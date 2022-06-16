@@ -73,7 +73,7 @@
                   :tree-data="treeSelectData"
                   placeholder="请选择父文档"
                   tree-default-expand-all
-                  :replaceFileds="{title:'name',key:'id',value:'id'}"
+                  :replaceFields="{title:'name',key:'id',value:'id'}"
               >
               </a-tree-select>
             </a-form-item>
@@ -333,7 +333,9 @@ export default defineComponent({
       doc.value = {
         ebookId:route.query.ebookId
       }
+      /* 父文档下拉框初始化，相当于点击新增 */
       treeSelectData.value = Tool.copy(level1.value) || []
+      /* 为选择树添加一个无 */
       treeSelectData.value.unshift({id:0,name:'none'})
 
 

@@ -250,10 +250,7 @@ export default defineComponent({
     const resetModalLoading = ref(false)
 
     const handleResetModalOk = ()=>{
-
       resetModalLoading.value = true
-
-
       axios.post("/user/reset-password",user.value).then((response) =>{
         resetModalLoading.value = false
         const data = response.data /* data = commonResp */
@@ -273,7 +270,7 @@ export default defineComponent({
 
     /*重置密码*/
     const resetPassword = (record:any) =>{
-      modalVisible.value = true
+      resetModalVisible.value = true
       user.value = Tool.copy(record)
       user.value.password = null
     }

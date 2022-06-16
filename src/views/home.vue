@@ -16,6 +16,7 @@
           <template v-slot:title>
             <span><user-outlined />{{item.name}}</span>
           </template>
+<!--    二级菜单      -->
           <a-menu-item v-for="child in item.children" :key="child.id">
             <MailOutlined /><span>{{child.name}}</span>
           </a-menu-item>
@@ -122,10 +123,26 @@ export default defineComponent({
       });
     };
 
-
-
     const isShowWelcome = ref(true)
     let categoryId2 = 0
+
+    const handleQueryEbook = () =>{
+      axios.get( "/ebook/list?%E6%95%99%E7%A8%8B",{
+        params:{
+          page:1,
+          size:1000,
+          categoryId2:categoryId2
+        }
+      }).then((response)=>{
+        const data = response.data
+        ebooks.value = data.data.list
+        /*ebooks1.books = data.data*/
+        console.log(response)
+      });
+
+    }
+
+
 
     const handleClick = (value:any) =>{
       /*console.log("menu click",value)*/
@@ -142,20 +159,7 @@ export default defineComponent({
     }
 
 
-    const handleQueryEbook = () =>{
-      axios.get( "/ebook/list?%E6%95%99%E7%A8%8B",{
-        params:{
-          page:1,
-          size:1000,
-          categoryId2:categoryId2
-        }
-      }).then((response)=>{
-        const data = response.data
-        ebooks.value = data.data.list
-        /*ebooks1.books = data.data*/
-        console.log(response)
-      });
-    }
+
 
 
     onMounted(()=>{

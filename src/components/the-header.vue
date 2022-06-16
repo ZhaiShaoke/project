@@ -1,6 +1,6 @@
 <template>
   <a-layout-header class="header">
-    <div class="logo" >甲蛙知识库</div>
+    <div class="logo" >ydck知识库</div>
     <a-menu
         theme="dark"
         mode="horizontal"
@@ -24,7 +24,7 @@
       </a-menu-item>
 
       <a class="login-menu" v-show="user.id">
-        <span>Hello,{{user.loginName}}</span>
+        <span>Hello {{user.loginName}}</span>
       </a>
       <a class="login-menu" v-show="!user.id" @click="showLoginModal">
         <span>Sign in</span>

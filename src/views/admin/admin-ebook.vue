@@ -30,12 +30,14 @@
           :loading="loading"
           @change="handleTableChange"
       >
+<!--  封面      -->
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar" />
         </template>
         <template v-slot:category="{ text, record }">
           <span>{{getCategoryName(record.category1Id)}} / {{getCategoryName(record.category2Id)}}</span>
         </template>
+<!-- 按钮       -->
         <template v-slot:action="{ text, record }">
           <a-space size="small">
             <router-link :to="'/admin/doc?ebookId='+record.id">
@@ -78,7 +80,7 @@
         <a-form-item label="分类">
           <a-cascader
             v-model:value="categoryIds"
-            :filed-names="{label:'name',value:'id',children:'children'}"
+            :field-names="{label:'name',value:'id',children:'children'}"
             :options="level1"
             />
         </a-form-item>
@@ -214,6 +216,7 @@ export default defineComponent({
     const edit = (record:any) =>{
       modalVisible.value = true
       ebook.value = Tool.copy(record)
+      /* 把一级分类和二级分类组合起来赋给categoryIds这个显示变量  */
       categoryIds.value = [ebook.value.category1Id,ebook.value.category2Id]
     }
 
